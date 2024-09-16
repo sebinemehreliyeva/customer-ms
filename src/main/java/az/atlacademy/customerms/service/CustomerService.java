@@ -1,14 +1,12 @@
 package az.atlacademy.customerms.service;
 
-import az.atlacademy.customerms.entity.Customer;
+import az.atlacademy.customerms.model.request.CustomerRequestDto;
+import az.atlacademy.customerms.model.response.CustomerResponseDto;
 
-import java.util.List;
-import java.util.Optional;
 
 public interface CustomerService {
-    Customer createCustomer(Customer customer);
-    Optional<Customer> getCustomerById(Long id);
-    List<Customer> getAllCustomers();
-    Customer updateCustomer(Long id, Customer customer);
-    void deleteCustomer(Long id);
+    void saveCustomer(CustomerRequestDto dto);
+    CustomerResponseDto getCustomerById(Long id);
+
+
 }

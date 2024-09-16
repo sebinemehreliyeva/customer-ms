@@ -1,44 +1,27 @@
 package az.atlacademy.customerms.controller;
 
-import az.atlacademy.customerms.entity.Customer;
+import az.atlacademy.customerms.model.request.CustomerRequestDto;
+import az.atlacademy.customerms.model.response.CustomerResponseDto;
 import az.atlacademy.customerms.service.CustomerService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-
 @RestController
-@RequestMapping("/customers")
+@RequestMapping("api/v1/customers")
+@RequiredArgsConstructor
 public class CustomerController {
-
-    @Autowired
-    private CustomerService customerService;
-
-    @PostMapping
-    public Customer createCustomer(@RequestBody Customer customer) {
-        return customerService.createCustomer(customer);
-    }
+    private final CustomerService customerService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable Long id) {
-        Optional<Customer> customer = customerService.getCustomerById(id);
-        return customer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<CustomerResponseDto> getCustomerById(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(customerService.getCustomerById(id));
     }
 
-    @GetMapping
-    public List<Customer> getAllCustomers() {
-        return customerService.getAllCustomers();
-    }
-
-    @PutMapping("/{id}")
-    public Customer updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
-        return customerService.updateCustomer(id, customer);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteCustomer(@PathVariable Long id) {
-        customerService.deleteCustomer(id);
+    @PostMapping
+    public ResponseEntity<Void> saveCustomer(@RequestBody CustomerRequestDto dto){
+        customerService.saveCustomer(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

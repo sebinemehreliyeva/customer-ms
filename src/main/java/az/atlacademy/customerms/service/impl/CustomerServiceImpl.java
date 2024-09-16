@@ -1,52 +1,37 @@
 package az.atlacademy.customerms.service.impl;
 
-import az.atlacademy.customerms.entity.Customer;
-import az.atlacademy.customerms.repository.CustomerRepository;
+import az.atlacademy.customerms.dao.entity.CustomerEntity;
+import az.atlacademy.customerms.dao.repository.CustomerRepository;
+import az.atlacademy.customerms.model.request.CustomerRequestDto;
+import az.atlacademy.customerms.model.response.CustomerResponseDto;
 import az.atlacademy.customerms.service.CustomerService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import static az.atlacademy.customerms.mapper.CustomerMapper.CUSTOMER_MAPPER;
 
 @Service
+@RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
-
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
     @Override
-    public Customer createCustomer(Customer customer) {
-        return customerRepository.save(customer);
+    public void saveCustomer(CustomerRequestDto dto) {
+        CustomerEntity entity = CUSTOMER_MAPPER.buildCustomerEntity(dto);
+        customerRepository.save(entity);
     }
 
     @Override
-    public Optional<Customer> getCustomerById(Long id) {
-        return customerRepository.findById(id);
+    public CustomerResponseDto getCustomerById(Long id) {
+        var entity = fetchCustomerById(id);
+        return CUSTOMER_MAPPER.buildCustomerResponse(entity);
     }
 
-    @Override
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
-    }
 
-    @Override
-    public Customer updateCustomer(Long id, Customer customer) {
-        Optional<Customer> existingCustomer = customerRepository.findById(id);
-        if (existingCustomer.isPresent()) {
-            Customer updatedCustomer = existingCustomer.get();
-            updatedCustomer.setFullName(customer.getFullName());
-            updatedCustomer.setAge(customer.getAge());
-            updatedCustomer.setPin(customer.getPin());
-            updatedCustomer.setBalance(customer.getBalance());
-            return customerRepository.save(updatedCustomer);
-        }
-        return null;
-    }
 
-    @Override
-    public void deleteCustomer(Long id) {
-        customerRepository.deleteById(id);
+    private CustomerEntity fetchCustomerById(Long id) {
+        return customerRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("CUSTOMER_NOT_FOUND")
+        );
     }
 }
-
